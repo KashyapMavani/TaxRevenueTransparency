@@ -13,6 +13,8 @@ contract Task{
     address[] public sectors;
     address[] public contractors;
     Application[] public Applications;
+    Application public acceptApp;
+    address acceptedContractor;
 
     // Modifer for contractors only
     modifier onlyContractor{
@@ -48,4 +50,21 @@ contract Task{
         Application memory app = Application(msg.sender, wrk, amt, tot);
         Applications.push(app);
     }
+
+    // Accept Application from all the applications
+    function acceptApplication(uint256 indexOfApplication) public {
+        bool isSector = false;
+        for (uint256 i = 0; i < sectors.length; i++) {
+            if (sectors[i] == msg.sender) {
+                isSector = true;
+                break;
+            }
+        }
+        if(isSector){
+            revert("You are not an insider sector.");
+        }
+        acceptApp = Applications[indexOfApplication];
+        acceptedContractor = Applications[indexOfApplication].nameOfContractor;
+    }
+
 }
