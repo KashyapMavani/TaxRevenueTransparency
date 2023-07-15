@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-
+error notContractor();
 struct Application{
     address nameOfContractor;
     string[] works;
@@ -13,8 +13,21 @@ contract Task{
     address[] public sectors;
     address[] public contractors;
     Application[] public Applications;
- 
-    // modifier  onlySectors
+
+    // Modifer for contractors only
+    modifier onlyContractor{
+        bool isContractor = false;
+        for (uint256 i = 0; i < contractors.length; i++) {
+            if (sectors[i] == msg.sender) {
+                isContractor = true;
+                break;
+            }
+        }
+        require(isContractor, "You are not verified contractor.");
+        _;
+    }
+
+    // constructor for Task, only sectors can call
     constructor(address[] memory sector, address[] memory contractor){
         sectors = sector;
         contractors = contractor;
@@ -28,8 +41,9 @@ contract Task{
         require(isSector, "You are not an insider sector.");
     }
 
-    function f_apply(string[] memory wrk, uint256[] memory amt, uint256 tot) public {
+    // Apply for the contractors only
+    function f_apply (string[] memory wrk, uint256[] memory amt, uint256 tot) public onlyContractor {
         Application memory app = Application(msg.sender, wrk, amt, tot);
-        Applications.push(app);       
+        Applications.push(app);
     }
 }
