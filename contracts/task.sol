@@ -38,7 +38,9 @@ contract Task{
                 break;
             }
         }
-        require(isSector, "You are not an insider sector.");
+        if(isSector){
+            revert("You are not an insider sector.");
+        }
     }
 
     // Apply for the contractors only
