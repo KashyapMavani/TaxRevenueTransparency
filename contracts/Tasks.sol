@@ -64,4 +64,16 @@ contract Tasks{
         acceptApp = Applications[indexOfApplication];
         acceptedContractor = Applications[indexOfApplication].nameOfContractor;
     }
+
+    function payContractor() public payable {
+        // require(price.getConversionRate(msg.value) >= minimumUSD, "Less than mimimum amount.");
+        // funders.push(msg.sender);
+        // addressToFunder[msg.sender] += msg.value;
+    }
+
+    function contractorWithdrawal() public{
+        (bool success,) = payable(acceptedContractor).call{value: address(this).balance}("");
+        require(success, "Failed to transfer");
+    }
+
 }
