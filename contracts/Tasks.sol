@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-error notContractor();
+// error notContractor();
 
 
 contract Tasks{
@@ -28,7 +28,6 @@ contract Tasks{
     function setSector(address _address) public {
         temp = _address;
     }
-
 
     // Modifer for contractors only
     modifier onlyContractor{
@@ -65,15 +64,15 @@ contract Tasks{
         acceptedContractor = Applications[indexOfApplication].nameOfContractor;
     }
 
-    function payContractor() public payable {
-        // require(price.getConversionRate(msg.value) >= minimumUSD, "Less than mimimum amount.");
-        // funders.push(msg.sender);
-        // addressToFunder[msg.sender] += msg.value;
-    }
+    // function payContractor() public payable {
+    //     // require(price.getConversionRate(msg.value) >= minimumUSD, "Less than mimimum amount.");
+    //     // funders.push(msg.sender);
+    //     // addressToFunder[msg.sender] += msg.value;
+    // }
 
-    function contractorWithdrawal() public{
-        (bool success,) = payable(acceptedContractor).call{value: address(this).balance}("");
-        require(success, "Failed to transfer");
-    }
+    // function contractorWithdrawal() public{
+    //     (bool success,) = payable(acceptedContractor).call{value: address(this).balance}("");
+    //     require(success, "Failed to transfer");
+    // }
 
 }
