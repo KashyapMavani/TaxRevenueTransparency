@@ -35,8 +35,4 @@ contract CentralGovernment {
     function getTotalFunds() public view returns (uint256) {
         return totalFunds;
     }
-
-    function transferOwnership(address newOwner) public onlyOwner {
-        owner = newOwner;
-    }
 }
