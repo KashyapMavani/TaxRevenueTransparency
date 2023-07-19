@@ -31,10 +31,37 @@ contract FundMonitor {
         payable(organization2).transfer(amount);
     }
 
-    // Code for fundMonitor ends.
+    // -------------FUNDMONITOR ends.-------------
     // Code for the rest starts now.
     struct District{
         string nameOfDistrict;
+        address districtAddress;
+    }
+
+    function addDistrict() public {
+
+    }
+
+    // ----------------DISTRICT ENDS.----------------
+    // code for SECTORS
+    struct Sectors{
+        string nameOfSectors;
+        address sectorAddress;
+    }
+
+    function addSector() public {
         
     }
+    // ----------------SECTOR ENDS.----------------
+        // code for SECTORS
+    struct Contractor{
+        string nameOfContractor;
+        address contractorAddress;
+    }
+
+    function addContractor() public {
+        
+    }
+    // ----------------COTRACTOR ENDS.----------------
+
 }
