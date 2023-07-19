@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract FundMonitor {
+    // Fund monitor Code
     address public organization1;
     address public organization2;
     uint256 public allocatedFund;
@@ -29,4 +30,6 @@ contract FundMonitor {
         emit FundsTransferred(msg.sender, amount);
         payable(organization2).transfer(amount);
     }
+
+    // Code for fundMonitor ends.
 }
