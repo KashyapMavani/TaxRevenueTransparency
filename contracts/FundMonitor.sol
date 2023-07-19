@@ -32,4 +32,9 @@ contract FundMonitor {
     }
 
     // Code for fundMonitor ends.
+    // Code for the rest starts now.
+    struct District{
+        string nameOfDistrict;
+        
+    }
 }
