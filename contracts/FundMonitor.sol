@@ -31,7 +31,7 @@ contract FundMonitor {
     mapping(address => mapping(address => uint256)) public transferredFunds;
     mapping(address => mapping(address => Transfer[])) public transferHistory;
 
-    mapping(address => mapping(address => bool)) public isDistrictSector; // to check if the sector belongs to that district
+    // mapping(address => mapping(address => bool)) public isDistrictSector; // to check if the sector belongs to that district
 
     event FundsAllocated(
         address indexed sender,
@@ -58,16 +58,16 @@ contract FundMonitor {
         hierarchy[organization] = level;
     }
 
-    function allocateFunds(address fromAddress, address toAddress)
+    function allocateFunds(address fromAddress, address toAddress, uint256 value)
         external
-        payable
     {
-        allocatedFunds[fromAddress][toAddress] += msg.value;
-        emit FundsAllocated(msg.sender, fromAddress, toAddress, msg.value);
+        require(hierarchy[fromAddress] > hierarchy[toAddress], "You can only set hierarchy for lower organizations.");
+        allocatedFunds[fromAddress][toAddress] += value;
+        emit FundsAllocated(msg.sender, fromAddress, toAddress, value);
 
-        if (isDistrictSector[fromAddress][toAddress] == false) {
-            isDistrictSector[fromAddress][toAddress] = true;
-        }
+        // if (isDistrictSector[fromAddress][toAddress] == false) {
+        //     isDistrictSector[fromAddress][toAddress] = true;
+        // }
     }
 
     function transferFunds(

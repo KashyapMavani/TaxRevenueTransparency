@@ -13,12 +13,12 @@ contract("FundMonitor", (accounts) => {
   const supplier1 = accounts[6];
 
   // Define the hierarchy levels
-  const HIERARCHY_CENTRAL = 0;
-  const HIERARCHY_STATE = 1;
-  const HIERARCHY_DISTRICT = 2;
-  const HIERARCHY_SECTOR = 3;
-  const HIERARCHY_CONTRACTOR = 4;
-  const HIERARCHY_SUPPLIER = 5;
+  // const HIERARCHY_CENTRAL = 1;
+  const HIERARCHY_STATE = 2;
+  const HIERARCHY_DISTRICT = 3;
+  const HIERARCHY_SECTOR = 4;
+  const HIERARCHY_CONTRACTOR = 5;
+  const HIERARCHY_SUPPLIER = 6;
 
   // Declare the contract instance
   let fundMonitor;
@@ -64,16 +64,19 @@ contract("FundMonitor", (accounts) => {
     await fundMonitor.setHierarchy(district1, HIERARCHY_DISTRICT, { from: state1 });
 
     const initialBalanceDistrict1 = web3.utils.toBN(await web3.eth.getBalance(district1));
-    const amountToAllocate = web3.utils.toWei("1", "ether");
+    const amountToAllocate = web3.utils.toWei("0.01", "ether");
     await fundMonitor.allocateFunds(district1, state1, { from: centralGov, value: amountToAllocate });
 
     const finalBalanceDistrict1 = web3.utils.toBN(await web3.eth.getBalance(district1));
+    console.log(finalBalanceDistrict1.sub(initialBalanceDistrict1).toString()); // 0
+    console.log(amountToAllocate); // 1 eth
     assert.strictEqual(
       finalBalanceDistrict1.sub(initialBalanceDistrict1).toString(),
       amountToAllocate,
       "Funds were not allocated correctly"
     );
   });
+
 
   // Test the transferFunds function
   it("should transfer funds from one organization to another", async () => {
