@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
 contract FundMonitor {
     // global variable & modifier
@@ -176,4 +176,45 @@ contract FundMonitor {
         }
     }
     // ----------------COTRACTOR ENDS.----------------
+    // code for SUPPLIERS
+    struct Supplier {
+        string nameOfContractor;
+        address contractorAddress;
+    }
+
+    Supplier[] public suppliers;
+    mapping(address => bool) public isSupplier;
+
+    function addSupplier(
+        address _contractorAddress,
+        string memory _contractorName
+    ) public onlyOwner {
+        require(
+            !isContractor[_contractorAddress],
+            "Contractor already exists."
+        );
+        Contractor memory newcontractor = Contractor(
+            _contractorName,
+            _contractorAddress
+        );
+
+        contractors.push(newcontractor);
+        isContractor[_contractorAddress] = true;
+    }
+
+    function removeSupplier(address _contractorAddress) public onlyOwner {
+        require(
+            isContractor[_contractorAddress],
+            "Contractor does not exists."
+        );
+
+        for (uint256 i = 0; i < contractors.length; i++) {
+            if (contractors[i].contractorAddress == _contractorAddress) {
+                delete contractors[i];
+                isContractor[_contractorAddress] = false;
+                break;
+            }
+        }
+    }
+    // ----------------SUPPLIER ENDS.----------------
 }
