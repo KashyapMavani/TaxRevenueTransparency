@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 contract FundMonitor {
     // global variable & modifier
@@ -11,39 +11,63 @@ contract FundMonitor {
     }
 
     // Fund monitor Code
-    address public organization1;
-    address public organization2;
-    uint256 public allocatedFund;
-    uint256 public transferredFund;
+    struct Transfer {
+        address fromDistrict;
+        address toSector;
+        uint256 amount;
+    }
 
-    event FundsAllocated(address indexed sender, uint256 amount);
-    event FundsTransferred(address indexed sender, uint256 amount);
+    mapping(address => mapping(address => uint256)) public allocatedFunds;
+    mapping(address => mapping(address => uint256)) public transferredFunds;
+    mapping(address => mapping(address => Transfer[])) public transferHistory;
 
-    constructor(address _organization1, address _organization2) {
-        organization1 = _organization1;
-        organization2 = _organization2;
+    mapping(address => mapping(address => bool)) public isDistrictSector; // to check if the sector belongs to that district
+
+    event FundsAllocated(
+        address indexed sender,
+        address indexed district,
+        address indexed sector,
+        uint256 amount
+    );
+    event FundsTransferred(
+        address indexed sender,
+        address indexed fromDistrict,
+        address indexed toSector,
+        uint256 amount
+    );
+
+    constructor() {
         owner = msg.sender;
     }
 
-    function allocateFunds() external payable {
-        require(
-            msg.sender == organization1,
-            "Only organization1 can allocate funds."
-        );
-        allocatedFund += msg.value;
-        emit FundsAllocated(msg.sender, msg.value);
+    function allocateFunds(address fromAddress, address toAddress)
+        external
+        payable
+    {
+        allocatedFunds[fromAddress][toAddress] += msg.value;
+        emit FundsAllocated(msg.sender, fromAddress, toAddress, msg.value);
+
+        if (isDistrictSector[fromAddress][toAddress] == false) {
+            isDistrictSector[fromAddress][toAddress] = true;
+        }
     }
 
-    function transferFunds(uint256 amount) external {
+    function transferFunds(
+        address fromAddress,
+        address toAddress,
+        uint256 amount
+    ) external {
         require(
-            msg.sender == organization1,
-            "Only organization1 can transfer funds."
+            allocatedFunds[fromAddress][toAddress] >= amount,
+            "Insufficient allocated funds."
         );
-        require(allocatedFund >= amount, "Insufficient allocated funds.");
-        allocatedFund -= amount;
-        transferredFund += amount;
-        emit FundsTransferred(msg.sender, amount);
-        payable(organization2).transfer(amount);
+        allocatedFunds[fromAddress][toAddress] -= amount;
+        transferredFunds[fromAddress][toAddress] += amount;
+        transferHistory[fromAddress][toAddress].push(
+            Transfer(fromAddress, toAddress, amount)
+        );
+        emit FundsTransferred(msg.sender, fromAddress, toAddress, amount);
+        payable(toAddress).transfer(amount);
     }
 
     // -------------FUNDMONITOR ends.-------------
