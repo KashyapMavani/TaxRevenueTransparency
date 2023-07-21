@@ -61,33 +61,29 @@ contract FundMonitor {
     function allocateFunds(address fromAddress, address toAddress, uint256 value)
         external
     {
-        require(hierarchy[fromAddress] > hierarchy[toAddress], "You can only set hierarchy for lower organizations.");
+        require(hierarchy[fromAddress] < hierarchy[toAddress], "You can only allocate for lower organizations.");
         allocatedFunds[fromAddress][toAddress] += value;
         emit FundsAllocated(msg.sender, fromAddress, toAddress, value);
 
+    }
         // if (isDistrictSector[fromAddress][toAddress] == false) {
         //     isDistrictSector[fromAddress][toAddress] = true;
         // }
-    }
 
     function transferFunds(
-        address fromAddress,
+        // address fromAddress,
         address toAddress,
         uint256 amount
     ) external {
-        require(
-            allocatedFunds[fromAddress][toAddress] >= amount,
-            "Insufficient allocated funds."
-        );
-        allocatedFunds[fromAddress][toAddress] -= amount;
-        transferredFunds[fromAddress][toAddress] += amount;
-        transferHistory[fromAddress][toAddress].push(
-            Transfer(fromAddress, toAddress, amount)
-        );
-        emit FundsTransferred(msg.sender, fromAddress, toAddress, amount);
-        payable(toAddress).transfer(amount);
-    }
+        // address fromAddress = msg.sender;
+        // require(msg.sender == owner, "Only the organization can initiate the transfer");
+        require(toAddress != address(0), "Invalid recipient address");
+        require(amount > 0, "Amount should be greater than zero");
 
+        // Transfer funds from the organization's address to the specified address
+        (bool success, ) = toAddress.call{value: amount}("");
+        require(success, "Transfer failed");
+    }
     // -------------FUND MONITOR ends.-------------
     //  CENTRAL GOVENRMENT code.
     struct Central {
