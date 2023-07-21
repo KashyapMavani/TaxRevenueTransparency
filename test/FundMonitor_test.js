@@ -61,20 +61,12 @@ contract("FundMonitor", (accounts) => {
   it('should allocate funds from one address to another with higher hierarchy', async () => {
     await fundMonitor.setCentralGov(centralGov, { from: owner });
     await fundMonitor.setHierarchy(state1, HIERARCHY_STATE, { from: centralGov });
-    await fundMonitor.setHierarchy(district1, HIERARCHY_DISTRICT, { from: state1 });
-    await fundMonitor.setHierarchy(sector1, HIERARCHY_SECTOR, { from: district1 });
-    await fundMonitor.setHierarchy(contractor1, HIERARCHY_CONTRACTOR, { from: sector1 });
-    await fundMonitor.setHierarchy(supplier1, HIERARCHY_SUPPLIER, { from: contractor1 });
     
     const fromAddress = centralGov; // Replace with the address of an organization with higher hierarchy
     // Fetch the hierarchy value for fromAddress
-    const hierarchyFrom = await fundMonitor.hierarchy(fromAddress);
-    console.log('Hierarchy of fromAddress:', hierarchyFrom.toNumber());
 
     const toAddress = state1; // Replace with the address of an organization with lower hierarchy
     // Fetch the hierarchy value for toAddress
-    const hierarchyTo = await fundMonitor.hierarchy(toAddress);
-    console.log('Hierarchy of toAddress:', hierarchyTo.toNumber());
 
     const value = web3.utils.toWei('1', 'ether'); // Replace '1' with the amount of funds to allocate
     // Call the allocateFunds function
@@ -108,28 +100,34 @@ contract("FundMonitor", (accounts) => {
 
   // Test the transferFunds function
   it("should transfer funds to the specified address", async () => {
-    const initialBalance = web3.utils.toBN(web3.utils.toWei("10", "ether")); // Initial balance for the organization
+    await fundMonitor.setCentralGov(centralGov, { from: owner });
+    await fundMonitor.setHierarchy(state1, HIERARCHY_STATE, { from: centralGov });
+
+    // const initialBalance = web3.utils.toBN(web3.utils.toWei("10", "ether")); // Initial balance for the organization
     const transferAmount = web3.utils.toBN(web3.utils.toWei("1", "ether")); // Transfer amount
 
     // Allocate funds to the organization's address
-    await fundMonitor.allocateFunds(accounts[0], transferAmount, {
-      from: accounts[0],
-      value: initialBalance,
-    });
+    await fundMonitor.allocateFunds(centralGov, state1, transferAmount);
 
     // Get the recipient's initial balance
-    const recipientInitialBalance = await web3.eth.getBalance(accounts[1]);
+    const recipientInitialBalance = await web3.eth.getBalance(state1);
+    const recipientInitialBalanceBN = await web3.utils.toBN(recipientInitialBalance);
 
     // Transfer funds from the organization to the recipient's address
-    await fundMonitor.transferFunds(accounts[1], transferAmount, {
-      from: accounts[0],
+    await fundMonitor.transferFunds(state1, transferAmount, {
+      from: centralGov,
+      value: transferAmount
     });
 
     // Get the recipient's updated balance
-    const recipientFinalBalance = await web3.eth.getBalance(accounts[1]);
+    const recipientFinalBalance = await web3.eth.getBalance(state1);
 
     // Calculate the expected final balance for the recipient
-    const expectedFinalBalance = recipientInitialBalance.add(transferAmount);
+    console.log("initial balance :",recipientInitialBalance);
+    console.log("transfer amount :",transferAmount);
+    console.log("final balance   :",recipientFinalBalance);
+    const expectedFinalBalance = recipientInitialBalanceBN.add(transferAmount);
+    console.log("Expected balance:",expectedFinalBalance);
 
     // Check if the recipient's balance has increased by the transferred amount
     assert.strictEqual(

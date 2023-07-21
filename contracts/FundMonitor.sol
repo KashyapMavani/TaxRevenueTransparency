@@ -69,12 +69,11 @@ contract FundMonitor {
         // if (isDistrictSector[fromAddress][toAddress] == false) {
         //     isDistrictSector[fromAddress][toAddress] = true;
         // }
-
-    function transferFunds(
-        // address fromAddress,
-        address toAddress,
-        uint256 amount
-    ) external {
+                        // address fromAddress,
+    function transferFunds(address toAddress, uint256 amount) 
+        external
+        payable 
+    {
         // address fromAddress = msg.sender;
         // require(msg.sender == owner, "Only the organization can initiate the transfer");
         require(toAddress != address(0), "Invalid recipient address");
