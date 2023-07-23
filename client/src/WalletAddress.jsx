@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import {abi} from "./abi.js";
+import { abi } from "./constants";
 
-const CentralGov = () => {
+const WalletAddress = () => {
   const [defaultAccount, setDefaultAccount] = useState(null);
   const [userBalance, setUserBalance] = useState(null);
   const [fundMonitorContract, setFundMonitorContract] = useState(null);
@@ -104,7 +104,7 @@ const CentralGov = () => {
 
   return (
     <>
-      <div className="walletAddress"><h3>Connect Central Governement Wallet</h3></div>
+      <div className="walletAddress">WalletAddress</div>
       <button onClick={connectWalletHandler}>Connect</button>
       <div className="accountDisplay">
         <h3>Address: {defaultAccount}</h3>
@@ -154,4 +154,4 @@ const CentralGov = () => {
   );
 };
 
-export default CentralGov;
+export default WalletAddress;

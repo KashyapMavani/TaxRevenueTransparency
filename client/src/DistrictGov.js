@@ -1,79 +1,156 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import {abi} from "./abi.js";
 
 const DistrictGovernmentPage = () => {
-  const [stateGovernmentMoney, setStateGovernmentMoney] = useState(500000); // Replace with the actual received money from state government
-  const [allocatedForMLA, setAllocatedForMLA] = useState(0);
-  const [allocatedForHealthCare, setAllocatedForHealthCare] = useState(0);
-  const [allocatedForRoadTransport, setAllocatedForRoadTransport] = useState(0);
+  const [defaultAccount, setDefaultAccount] = useState(null);
+  const [userBalance, setUserBalance] = useState(null);
+  const [fundMonitorContract, setFundMonitorContract] = useState(null);
+  const [fromAddress, setFromAddress] = useState("");
+  const [toAddress, setToAddress] = useState("");
+  const [amount, setAmount] = useState("");
 
-  const [transferredToMLA, setTransferredToMLA] = useState(0);
-  const [transferredToHealthCare, setTransferredToHealthCare] = useState(0);
-  const [transferredToRoadTransport, setTransferredToRoadTransport] = useState(0);
+  useEffect(() => {
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      accountChangedHandler(window.ethereum.selectedAddress);
+    }
+  }, []);
+
+  const connectWalletHandler = () => {
+    if (window.ethereum) {
+      window.ethereum
+        .request({ method: "eth_requestAccounts" })
+        .then((result) => {
+          accountChangedHandler(result[2]);
+        })
+        .catch((error) => {
+          console.error("User Denied account access", error);
+        });
+    } else {
+      console.log("Install Metamask");
+    }
+  };
+
+  const accountChangedHandler = (newAccount) => {
+    setDefaultAccount(newAccount);
+    getUserBalance(newAccount);
+    initializeFundMonitorContract(newAccount);
+  };
+
+  const getUserBalance = async (address) => {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const balance = await provider.getBalance(address);
+      setUserBalance(ethers.formatUnits(balance));
+    } catch (error) {
+      console.error("Error fetching user balance", error);
+    }
+  };
+
+  const initializeFundMonitorContract = async (account) => {
+    if (account) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contractAddress = "0x4711CAB8cc28191F16D40eA850b7677BA0cb6c8e";
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+      setFundMonitorContract(contract);
+    }
+  };
+
+  const allocateFundsHandler = async () => {
+    try {
+      if (!fundMonitorContract) {
+        console.log("FundMonitor contract not initialized");
+        return;
+      }
+      if (!fromAddress || !toAddress || !amount) {
+        console.log(
+          "Please enter all required parameters(sAddress, rAddress, amount)"
+        );
+        return;
+      }
+
+      const transaction = await fundMonitorContract.allocateFunds(
+        fromAddress,
+        toAddress,
+        ethers.parseEther(amount)
+      );
+      await transaction.wait();
+    } catch (error) {
+      console.error("error allocating funds", error);
+    }
+  };
+
+   const transferFundsHandler = async () => {
+    try {
+      if (!fundMonitorContract) {
+        console.log("FundMonitor contract not initialized.");
+        return;
+      }
+      if (!toAddress || !amount) {
+        console.log("Please enter all required parameters.");
+        return;
+      }
+      console.log(amount);
+      const transaction = await fundMonitorContract.transferFunds(
+        toAddress,
+        ethers.parseEther(amount)
+      );
+      await transaction.wait();
+    } catch (error) {
+      console.error("Error transferring funds: ", error);
+    }
+  };
 
   return (
-    <div>
-      <h1>District Government Page</h1>
-      <p>Money Received from State Government: {stateGovernmentMoney}</p>
-
-      <h2>Allocate Funds:</h2>
-      <label htmlFor="allocatedForMLA">Allocate for MLA's:</label>
-      <input
-        type="number"
-        id="allocatedForMLA"
-        value={allocatedForMLA}
-        onChange={(e) => setAllocatedForMLA(parseInt(e.target.value))}
-      />
-
-      <label htmlFor="allocatedForHealthCare">Allocate for Health Care Sector:</label>
-      <input
-        type="number"
-        id="allocatedForHealthCare"
-        value={allocatedForHealthCare}
-        onChange={(e) => setAllocatedForHealthCare(parseInt(e.target.value))}
-      />
-
-      <label htmlFor="allocatedForRoadTransport">Allocate for Road & Transport Sector:</label>
-      <input
-        type="number"
-        id="allocatedForRoadTransport"
-        value={allocatedForRoadTransport}
-        onChange={(e) => setAllocatedForRoadTransport(parseInt(e.target.value))}
-      />
-
-      <h2>Transfer Funds:</h2>
-      <label htmlFor="transferredToMLA">Transfer to MLA's:</label>
-      <input
-        type="number"
-        id="transferredToMLA"
-        value={transferredToMLA}
-        onChange={(e) => setTransferredToMLA(parseInt(e.target.value))}
-      />
-
-      <label htmlFor="transferredToHealthCare">Transfer to Health Care Sector:</label>
-      <input
-        type="number"
-        id="transferredToHealthCare"
-        value={transferredToHealthCare}
-        onChange={(e) => setTransferredToHealthCare(parseInt(e.target.value))}
-      />
-
-      <label htmlFor="transferredToRoadTransport">Transfer to Road & Transport Sector:</label>
-      <input
-        type="number"
-        id="transferredToRoadTransport"
-        value={transferredToRoadTransport}
-        onChange={(e) => setTransferredToRoadTransport(parseInt(e.target.value))}
-      />
-
-      <h2>Funds Allocation and Transfer Summary:</h2>
-      <p>Allocated for MLA's: {allocatedForMLA}</p>
-      <p>Allocated for Health Care Sector: {allocatedForHealthCare}</p>
-      <p>Allocated for Road & Transport Sector: {allocatedForRoadTransport}</p>                                                                                                                                                                                                                                                                                                                                                         
-
-      <p>Transferred to MLA's: {transferredToMLA}</p>
-      <p>Transferred to Health Care Sector: {transferredToHealthCare}</p>
-      <p>Transferred to Road & Transport Sector: {transferredToRoadTransport}</p>
-    </div>
+    <>
+  <div className="walletAddress"><h3>Connect District Governement Wallet</h3></div>
+      <button onClick={connectWalletHandler}>Connect</button>
+      <div className="accountDisplay">
+        <h3>Address: {defaultAccount}</h3>
+      </div>
+      <div className="balanceDisplay">
+        <h3>Balance: {userBalance} ETH</h3>
+      </div>
+      <div className="allocateFunds">
+        <h4>{"Allocate Funds"}</h4>
+        <input
+          type="text"
+          placeholder="From Address"
+          value={fromAddress}
+          onChange={(e) => setFromAddress(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="To Address"
+          value={toAddress}
+          onChange={(e) => setToAddress(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Amount(ETH)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button onClick={allocateFundsHandler}>Allocate</button>
+      </div>
+      <div className="transferFunds">
+        <h4>{"Transfer Funds"}</h4>
+        <input
+          type="text"
+          placeholder="To Address"
+          value={toAddress}
+          onChange={(e) => setToAddress(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Amount(ETH)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button onClick={transferFundsHandler}>Transfer</button>
+      </div>
+    </>
   );
 };
 
