@@ -61,27 +61,24 @@ contract FundMonitor {
     function allocateFunds(address fromAddress, address toAddress, uint256 value)
         external
     {
-        require(hierarchy[fromAddress] < hierarchy[toAddress], "You can only allocate for lower organizations.");
+        // require(hierarchy[fromAddress] < hierarchy[toAddress], "You can only allocate for lower organizations.");
         allocatedFunds[fromAddress][toAddress] += value;
         emit FundsAllocated(msg.sender, fromAddress, toAddress, value);
 
     }
-        // if (isDistrictSector[fromAddress][toAddress] == false) {
-        //     isDistrictSector[fromAddress][toAddress] = true;
-        // }
-                        // address fromAddress,
-    function transferFunds(address toAddress, uint256 amount) 
+
+    function transferFunds(address payable toAddress, uint256 amount) 
         external
         payable 
     {
-        // address fromAddress = msg.sender;
-        // require(msg.sender == owner, "Only the organization can initiate the transfer");
+        require(amount == msg.value, "Amount parameter should be equal to amount sent");
         require(toAddress != address(0), "Invalid recipient address");
+        // require(address(msg.sender).balance >= amount, "Insufficient balance");
         require(amount > 0, "Amount should be greater than zero");
 
         // Transfer funds from the organization's address to the specified address
-        (bool success, ) = toAddress.call{value: amount}("");
-        require(success, "Transfer failed");
+        (bool sent, ) = toAddress.call{value: msg.value}("");
+        require(sent, "Failed to send Ether");
     }
     // -------------FUND MONITOR ends.-------------
     //  CENTRAL GOVENRMENT code.

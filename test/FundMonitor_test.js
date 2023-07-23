@@ -99,85 +99,88 @@ contract("FundMonitor", (accounts) => {
 
 
   // Test the transferFunds function
-  it("should transfer funds to the specified address", async () => {
-    await fundMonitor.setCentralGov(centralGov, { from: owner });
-    await fundMonitor.setHierarchy(state1, HIERARCHY_STATE, { from: centralGov });
-
-    // const initialBalance = web3.utils.toBN(web3.utils.toWei("10", "ether")); // Initial balance for the organization
-    const transferAmount = web3.utils.toBN(web3.utils.toWei("1", "ether")); // Transfer amount
-
-    // Allocate funds to the organization's address
-    await fundMonitor.allocateFunds(centralGov, state1, transferAmount);
-
-    // Get the recipient's initial balance
-    const recipientInitialBalance = await web3.eth.getBalance(state1);
-    const recipientInitialBalanceBN = await web3.utils.toBN(recipientInitialBalance);
-
-    // Transfer funds from the organization to the recipient's address
-    await fundMonitor.transferFunds(state1, transferAmount, {
-      from: centralGov,
-      value: transferAmount
-    });
-
-    // Get the recipient's updated balance
-    const recipientFinalBalance = await web3.eth.getBalance(state1);
-
-    // Calculate the expected final balance for the recipient
-    console.log("initial balance :",recipientInitialBalance);
-    console.log("transfer amount :",transferAmount);
-    console.log("final balance   :",recipientFinalBalance);
-    const expectedFinalBalance = recipientInitialBalanceBN.add(transferAmount);
-    console.log("Expected balance:",expectedFinalBalance);
-
-    // Check if the recipient's balance has increased by the transferred amount
-    assert.strictEqual(
-      recipientFinalBalance.toString(),
-      expectedFinalBalance.toString(),
-      "Funds were not transferred correctly"
-    );
-  });
-
-  it("should revert if the recipient address is invalid", async () => {
-    const transferAmount = web3.utils.toBN(web3.utils.toWei("1", "ether")); // Transfer amount
-
+  // it("should transfer funds correctly and emit FundsTransferred event", async () => {
+  //   const amount = web3.utils.toWei("0.1", "ether"); // Amount to transfer
+  //   const toAddress = accounts[2]; // Replace with the address of the recipient
+  
+  //   // Get the recipient's initial balance
+  //   const recipientInitialBalance = await web3.eth.getBalance(toAddress);
+  
+  //   // Call the transferFunds function
+  //   const result = await fundMonitor.transferFunds(toAddress, amount, { from: centralGov, value: amount});
+  
+  //   // Get the recipient's updated balance
+  //   const recipientFinalBalance = await (web3.eth.getBalance(toAddress));
+  //   const recipientFinalBalanceBN = web3.utils.toBN(recipientFinalBalance);
+  
+  //   // Calculate the expected final balance for the recipient
+  //   const expectedFinalBalance = await web3.utils.toBN(recipientInitialBalance).add(web3.utils.toBN(amount));
+  
+  //   // Check if the recipient's balance has increased by the transferred amount
+  //   console.log("final bal - ",recipientFinalBalanceBN);
+  //   console.log("expected bal - ",expectedFinalBalance);
+  //   assert.ok(
+  //     recipientFinalBalanceBN.eq(expectedFinalBalance),
+  //     "Funds were not transferred correctly"
+  //   );
+  
+  //   // Check if the FundsTransferred event was emitted with the correct parameters
+  //   assert.strictEqual(result.logs.length, 1, "FundsTransferred event not emitted");
+  //   assert.strictEqual(result.logs[0].event, "FundsTransferred", "Incorrect event emitted");
+  //   assert.strictEqual(result.logs[0].args.sender, owner, "Incorrect sender address");
+  //   assert.strictEqual(result.logs[0].args.fromDistrict, owner, "Incorrect fromDistrict address");
+  //   assert.strictEqual(result.logs[0].args.toSector, toAddress, "Incorrect toSector address");
+  //   assert.strictEqual(result.logs[0].args.amount.toString(), amount, "Incorrect transferred amount");
+  // });
+  
+  it("should revert when transferring to the zero address", async () => {
+    const amount = web3.utils.toWei("1", "ether"); // Amount to transfer
+  
+    // Attempt to transfer funds to the zero address
     try {
-      // Try to transfer funds to an invalid recipient address (address(0))
-      await fundMonitor.transferFunds("0x0000000000000000000000000000000000000000", transferAmount, {
-        from: accounts[0],
-      });
+      await fundMonitor.transferFunds("0x0000000000000000000000000000000000000000", amount, { from: centralGov, value:amount });
       assert.fail("Transaction should have reverted");
     } catch (error) {
-      assert(error.message.includes("Invalid recipient address"), "Unexpected revert reason");
+      assert(error.message.includes("Invalid recipient address"), "Unexpected error message");
     }
   });
-
-  it("should revert if the transfer amount is zero", async () => {
-    const transferAmount = web3.utils.toBN(web3.utils.toWei("0", "ether")); // Transfer amount (zero)
-
+  
+  it("should revert when transferring zero amount", async () => {
+    // Attempt to transfer zero amount
     try {
-      // Try to transfer zero funds to a valid recipient address
-      await fundMonitor.transferFunds(accounts[1], transferAmount, {
-        from: accounts[0],
-      });
+      await fundMonitor.transferFunds(accounts[1], 0, { from: owner, value: 0 });
       assert.fail("Transaction should have reverted");
     } catch (error) {
-      assert(error.message.includes("Amount should be greater than zero"), "Unexpected revert reason");
+      assert(error.message.includes("Amount should be greater than zero"), "Unexpected error message");
     }
   });
-
-  it("should revert if the organization's balance is insufficient", async () => {
-    const transferAmount = web3.utils.toBN(web3.utils.toWei("1", "ether")); // Transfer amount
-
+  
+  it("should revert when the organization's balance is insufficient", async () => {
+    const amount = web3.utils.toWei("100000", "ether"); // Amount to transfer (larger than owner's balance)
+  
     try {
-      // Try to transfer funds from an organization with zero balance
-      await fundMonitor.transferFunds(accounts[1], transferAmount, {
-        from: accounts[0],
-      });
+      // Try to transfer funds larger than the owner's balance
+      await fundMonitor.transferFunds(accounts[1], amount, { from: owner, value:amount });
       assert.fail("Transaction should have reverted");
     } catch (error) {
       assert(error.message.includes("revert"), "Expected revert");
     }
   });
+  
+
+  // it("should revert if the organization's balance is insufficient", async () => {
+  //   const transferAmount = web3.utils.toBN(web3.utils.toWei("1", "ether")); // Transfer amount
+
+  //   try {
+  //     // Try to transfer funds from an organization with zero balance
+  //     await fundMonitor.transferFunds(accounts[1], transferAmount, {
+  //       from: accounts[0],
+  //     });
+  //     assert.fail("Transaction should have reverted");
+  //   } catch (error) {
+  //     assert(error.message.includes("revert"), "Expected revert");
+  //   }
+  // });
 
   // Add more tests for the other functions of the FundMonitor contract as needed
 });

@@ -62,22 +62,6 @@ const FundMonitor = () => {
     }
   };
 
-  const setHierarchy = async (organizationAddress, hierarchyLevel) => {
-    try {
-      const { contract, signer } = ethereumClient;
-  
-      // Call the contract function
-      const tx = await contract.setHierarchy(organizationAddress, hierarchyLevel);
-      await tx.wait(); // Wait for the transaction to be mined
-      console.log("Hierarchy set successfully for organization:", organizationAddress);
-  
-      // After setting the hierarchy, reload the funds data
-      loadFundsData();
-    } catch (error) {
-      console.error("Error calling setHierarchy:", error);
-    }  
-  };
-
   const allocateFunds = async (fromAddress, toAddress, value) => {
     try {
       const { contract, signer } = ethereumClient;
