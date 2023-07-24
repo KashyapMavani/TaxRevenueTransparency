@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import {abi} from "./abi.js";
+import {abi} from "../constants/abi.js";
 
-const DistrictGovernmentPage = () => {
+const CentralGov = () => {
   const [defaultAccount, setDefaultAccount] = useState(null);
   const [userBalance, setUserBalance] = useState(null);
   const [fundMonitorContract, setFundMonitorContract] = useState(null);
@@ -21,7 +21,7 @@ const DistrictGovernmentPage = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[2]);
+          accountChangedHandler(result[0]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);
@@ -104,55 +104,54 @@ const DistrictGovernmentPage = () => {
 
   return (
     <>
-  <div className="walletAddress"><h3>Connect District Governement Wallet</h3></div>
+      <div className="walletAddress"><h3>Connect Central Governement Wallet</h3></div>
       <button onClick={connectWalletHandler}>Connect</button>
       <div className="accountDisplay">
-        <h3>Address: {defaultAccount}</h3>
+        <h3>Address of Central Government's Wallet : {defaultAccount}</h3>
       </div>
       <div className="balanceDisplay">
-        <h3>Balance: {userBalance} ETH</h3>
+        <h3>Balance of Central Government's Wallet : {userBalance} ETH</h3>
       </div>
       <div className="allocateFunds">
-        <h4>{"Allocate Funds"}</h4>
+        <h4>{"Allocate Funds for State Government"}</h4>
         <input
           type="text"
           placeholder="From Address"
           value={fromAddress}
           onChange={(e) => setFromAddress(e.target.value)}
-        />
+        />--
         <input
           type="text"
           placeholder="To Address"
           value={toAddress}
           onChange={(e) => setToAddress(e.target.value)}
-        />
+        />--
         <input
           type="text"
           placeholder="Amount(ETH)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-        />
+        />--
         <button onClick={allocateFundsHandler}>Allocate</button>
       </div>
       <div className="transferFunds">
-        <h4>{"Transfer Funds"}</h4>
+        <h4>{"Transfer Funds to State Government"}</h4>
         <input
           type="text"
           placeholder="To Address"
           value={toAddress}
           onChange={(e) => setToAddress(e.target.value)}
-        />
+        />--
         <input
           type="text"
           placeholder="Amount(ETH)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-        />
+        />--
         <button onClick={transferFundsHandler}>Transfer</button>
       </div>
     </>
   );
 };
 
-export default DistrictGovernmentPage;
-                                
+export default CentralGov;

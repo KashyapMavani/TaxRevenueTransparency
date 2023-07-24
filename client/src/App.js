@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import CentralGov from './CentralGov';
-import StateGov from './StateGov';
-import DistrictGovernmentPage from './DistrictGov';
-import HealthCareSectorPage from './HealthCare';
-import MLAPage from './MLA';
-import RoadTransportSectorPage from './Roads&Transport';
-import MLAContractorPage from './MLAContractor';
-import HCContractorPage from './HealthCareContractor';
-import RTContractorPage from './R&TContarctor';
+import CentralGov from './Components/CentralGov';
+import StateGov from './Components/StateGov';
+import DistrictGovernmentPage from './Components/DistrictGov';
+import HealthCareSectorPage from './Components/HealthCare';
+import MLAPage from './Components/MLA';
+import RoadTransportSectorPage from './Components/Roads&Transport';
+import ContractorPage from './Components/Contractor';
+import MaterialSupplierPage from './Components/MaterialSupplier';
+import LabourSupplierPage from './Components/LabourSupplier';
+
 
 const App = () => {
   // const [transferredAmount, setTransferredAmount] = useState(0);
@@ -23,9 +24,11 @@ const App = () => {
       <MLAPage />
       <HealthCareSectorPage />
       <RoadTransportSectorPage />
-      <MLAContractorPage />
-      <HCContractorPage />
-      <RTContractorPage />
+      <ContractorPage />
+      <MaterialSupplierPage />
+      <LabourSupplierPage />
+
+
     </div>
   );
 };

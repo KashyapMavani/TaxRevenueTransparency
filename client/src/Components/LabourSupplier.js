@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import {abi} from "./abi.js";
+import {abi} from "../constants/abi.js";
 
-const CentralGov = () => {
+const MaterialSupplierPage = () => {
   const [defaultAccount, setDefaultAccount] = useState(null);
   const [userBalance, setUserBalance] = useState(null);
   const [fundMonitorContract, setFundMonitorContract] = useState(null);
@@ -21,7 +21,7 @@ const CentralGov = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[0]);
+          accountChangedHandler(result[8]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);
@@ -104,54 +104,32 @@ const CentralGov = () => {
 
   return (
     <>
-      <div className="walletAddress"><h3>Connect Central Governement Wallet</h3></div>
+      <div className="walletAddress"><h3>Connect Labour Supplier's Wallet</h3></div>
       <button onClick={connectWalletHandler}>Connect</button>
       <div className="accountDisplay">
-        <h3>Address: {defaultAccount}</h3>
+        <h3>Address of Labour Supplier's Wallet : {defaultAccount}</h3>
       </div>
       <div className="balanceDisplay">
-        <h3>Balance: {userBalance} ETH</h3>
-      </div>
-      <div className="allocateFunds">
-        <h4>{"Allocate Funds"}</h4>
-        <input
-          type="text"
-          placeholder="From Address"
-          value={fromAddress}
-          onChange={(e) => setFromAddress(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="To Address"
-          value={toAddress}
-          onChange={(e) => setToAddress(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Amount(ETH)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <button onClick={allocateFundsHandler}>Allocate</button>
+        <h3>Balance of Labour Supplier's Wallet : {userBalance} ETH</h3>
       </div>
       <div className="transferFunds">
-        <h4>{"Transfer Funds"}</h4>
+<h4>{"Transfer Funds to Government Entities"}</h4>
         <input
           type="text"
           placeholder="To Address"
           value={toAddress}
           onChange={(e) => setToAddress(e.target.value)}
-        />
+        />--
         <input
           type="text"
           placeholder="Amount(ETH)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-        />
+        />--
         <button onClick={transferFundsHandler}>Transfer</button>
       </div>
     </>
   );
 };
 
-export default CentralGov;
+export default MaterialSupplierPage;
