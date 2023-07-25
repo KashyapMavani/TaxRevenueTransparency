@@ -21,7 +21,7 @@ const RoadTransportSectorPage = () => {
         window.ethereum
           .request({ method: "eth_requestAccounts" })
           .then((result) => {
-            accountChangedHandler(result[5]);
+            accountChangedHandler(result[4]);
           })
           .catch((error) => {
             console.error("User Denied account access", error);

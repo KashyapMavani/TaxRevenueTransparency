@@ -21,7 +21,7 @@ const StateGov = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[1]);
+          accountChangedHandler(result[0]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);

@@ -21,7 +21,7 @@ const DistrictGovernmentPage = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[2]);
+          accountChangedHandler(result[1]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);

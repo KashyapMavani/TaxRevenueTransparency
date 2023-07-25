@@ -21,7 +21,7 @@ const MaterialSupplierPage = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[8]);
+          accountChangedHandler(result[7]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);

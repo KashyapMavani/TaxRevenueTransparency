@@ -21,7 +21,7 @@ const HealthCareSectorPage = () => {
         window.ethereum
           .request({ method: "eth_requestAccounts" })
           .then((result) => {
-            accountChangedHandler(result[4]);
+            accountChangedHandler(result[3]);
           })
           .catch((error) => {
             console.error("User Denied account access", error);

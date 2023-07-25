@@ -21,7 +21,7 @@ const MLAPage = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[3]);
+          accountChangedHandler(result[2]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);

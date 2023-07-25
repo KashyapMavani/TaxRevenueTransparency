@@ -21,7 +21,7 @@ const ContractorPage = () => {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
         .then((result) => {
-          accountChangedHandler(result[6]);
+          accountChangedHandler(result[5]);
         })
         .catch((error) => {
           console.error("User Denied account access", error);
