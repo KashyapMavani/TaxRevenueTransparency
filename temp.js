@@ -1,6 +1,7 @@
 const { ethers } = require("ethers");
-import {INFURA_KEY} from ".env"
+require('dotenv').config();
 
+const INFURA_KEY = process.env.INFURA_KEY;
 const network = "sepolia";
 const provider = ethers.getDefaultProvider(network,{infura : INFURA_KEY});
 
